@@ -43,8 +43,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #5791ff;
-
-  // flex-wrap: nowrap;
+ // width: auto;
+  //overflow-x: hidden;
 }
 
 nav {

@@ -32,6 +32,7 @@ const deleteTodo = asynHandler(async (req, res) => {
     try {
         const todo = await Todo.findByIdAndRemove({ _id: req.params.id });
         res.status(200).json("deleted successfully");
+        res.status(200).json(todo);
     } catch (error) {
         res.status(500).json(error);
     }

@@ -5,14 +5,24 @@
         <div class="icon"><i class="uil uil-plus"></i></div>
         <p>Add new note</p>
       </li>
-      <ul v-for="item in todos" :key="item._id">
-        <li class="note">
-          <div class="details" v-if="item.postedBy === UserId">
+    </div>
+    <div class="gridnote row">
+      <div v-for="item in todos" :key="item._id">
+        <li  class="col-10 note" v-if="item.postedBy === UserId">
+          <div class="details">
             <p>{{ item.text }}</p>
-            <img :src="item.photo" alt="" width="40" />
+            <img :src="item.photo" alt="" width="100" />
+          </div>
+          <div class="buttom">
+            <button class="btn btn-success">
+              <i class="uil uil-pen"></i>
+            </button>
+            <button class="btn btn-danger" @click="deleteTodo(item._id)">
+              <i class="uil uil-trash"></i>
+            </button>
           </div>
         </li>
-      </ul>
+      </div>
     </div>
   </div>
 
@@ -21,11 +31,14 @@
 </template>
 
 <script>
+import axios from "axios";
 // @ is an alias to /src
 // import { reactive, onMounted } from "vue";
 import { mapMutations, mapState } from "vuex";
 // import axios from "axios";
 //import router from "@/router";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
   name: "HomeView",
   props: ["messageprops"],
@@ -37,6 +50,7 @@ export default {
   },
   computed: {
     ...mapState({
+      token: (state) => state.user,
       user: (state) => state.userToken,
       todos: (state) => state.AllToDo,
       UserId: (state) => state.LoggedUserId,
@@ -54,6 +68,26 @@ export default {
       }
     },
 
+    async deleteTodo(id) {
+      try {
+        let response = await axios.delete(
+          `http://localhost:5000/delete/${id}`,
+          {
+            headers: {
+              authorization: JSON.parse(this.token)
+            },
+          }
+        );
+        alert("delete");
+        if (response.status == 200) {
+          toast.success(response.data);
+        }
+      } catch (error) {
+        alert(error.message);
+        console.log(error.message);
+      }
+    },
+
     getUsername() {
       const parts = this.user.email.split("@");
       if (parts.length === 2 && parts[1] === "gmail.com") {
@@ -66,6 +100,7 @@ export default {
   async mounted() {
     let user = localStorage.getItem("user");
     this.isUserLoggInFunction();
+    console.log(this.token);
     if (user) {
       this.getAllTodoS();
       this.getUsername();
@@ -115,15 +150,11 @@ export default {
   font-family: "Poppins", sans-serif;
 }
 
-::selection {
-  color: #fff;
-  background: #618cf8;
-}
 .wrapper {
   margin: 50px;
   display: grid;
-  gap: 25px;
-  grid-template-columns: repeat(auto-fill, 265px);
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, 20%);
 }
 .wrapper li {
   height: 250px;
@@ -132,6 +163,53 @@ export default {
   padding: 15px 20px 20px;
   background: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+.gridnote {
+  display: grid;
+  grid-template-columns: 25% 25% 25%;
+  gap: 10px;
+  margin: 50px;
+  li {
+    height: 250px;
+    list-style: none;
+    border-radius: 5px;
+    padding: 15px 20px 20px;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+  .note {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .note .details {
+    max-height: 165px;
+    overflow: hidden;
+
+    margin-top: 15%;
+  }
+  .note .details::-webkit-scrollbar,
+  .note .details:hover::-webkit-scrollbar,
+  .note .details:hover::-webkit-scrollbar-track,
+  .note .details:hover::-webkit-scrollbar-thumb {
+    background: #e6e6e6;
+    border-radius: 25px;
+  }
+
+  .note {
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+    p {
+      font-size: 22px;
+      font-weight: 200;
+    }
+  }
+  .buttom {
+    button {
+      padding: 5px;
+      margin: 5px;
+    }
+  }
 }
 .add-box,
 .icon {
@@ -157,39 +235,6 @@ export default {
   color: #88abff;
   font-weight: 500;
   margin-top: 20px;
-}
-.note {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.note .details {
-  max-height: 165px;
-  overflow-y: auto;
-}
-.note .details::-webkit-scrollbar,
-.popup textarea::-webkit-scrollbar {
-  width: 0;
-}
-.note .details:hover::-webkit-scrollbar,
-.note .details:hover::-webkit-scrollbar-track,
-.note .details:hover::-webkit-scrollbar-thumb {
-  background: #e6e6e6;
-  border-radius: 25px;
-}
-.note p {
-  font-size: 22px;
-  font-weight: 500;
-}
-.note span {
-  display: block;
-  color: #575757;
-  font-size: 16px;
-  margin-top: 5px;
-}
-.note {
-  padding-top: 10px;
-  border-top: 1px solid #ccc;
 }
 
 // form :where(input, textarea):focus {
