@@ -6,9 +6,9 @@
         <p>Add new note</p>
       </li>
     </div>
-    <div class="gridnote row">
+    <div class="gridnote">
       <div v-for="item in todos" :key="item._id">
-        <li  class="col-10 note" v-if="item.postedBy === UserId">
+        <li class="note" v-if="item.postedBy === UserId">
           <div class="details">
             <p>{{ item.text }}</p>
             <img :src="item.photo" alt="" width="100" />
@@ -74,16 +74,16 @@ export default {
           `http://localhost:5000/delete/${id}`,
           {
             headers: {
-              authorization: JSON.parse(this.token)
+              authorization: JSON.parse(this.token),
             },
           }
         );
-        alert("delete");
+        //alert("delete");
         if (response.status == 200) {
           toast.success(response.data);
+          window.location.reload();
         }
       } catch (error) {
-        alert(error.message);
         console.log(error.message);
       }
     },
@@ -158,35 +158,49 @@ export default {
 }
 .wrapper li {
   height: 250px;
+
   list-style: none;
   border-radius: 5px;
   padding: 15px 20px 20px;
-  background: #fff;
+  background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 .gridnote {
-  display: grid;
-  grid-template-columns: 25% 25% 25%;
-  gap: 10px;
-  margin: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 30px;
+
+
   li {
-    height: 250px;
+    height: 40vh;
+    width: 40vh;
+
+    margin: 30px;
     list-style: none;
     border-radius: 5px;
     padding: 15px 20px 20px;
-    background: #fff;
+    background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   }
+  // grid-column-gap: 20px;
+  // grid-row-gap: 20px;
+  // justify-items: stretch;
+  // align-items: stretch;
+ 
+
+
+
+
   .note {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
   }
   .note .details {
     max-height: 165px;
     overflow: hidden;
 
-    margin-top: 15%;
+    margin-top: 5%;
   }
   .note .details::-webkit-scrollbar,
   .note .details:hover::-webkit-scrollbar,
@@ -225,14 +239,14 @@ export default {
 .add-box .icon {
   height: 78px;
   width: 78px;
-  color: #88abff;
+  color: #5791ff;
   font-size: 40px;
   border-radius: 50%;
   justify-content: center;
-  border: 2px dashed #88abff;
+  border: 2px dashed #5791ff;
 }
 .add-box p {
-  color: #88abff;
+  color: #5791ff;
   font-weight: 500;
   margin-top: 20px;
 }
