@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <h1 v-if="user">Welcome, {{ username }} !</h1>
     <div class="wrapper">
       <li class="add-box">
         <div class="icon"><i class="uil uil-plus"></i></div>
@@ -11,7 +12,7 @@
         <li class="note" v-if="item.postedBy === UserId">
           <div class="details">
             <p>{{ item.text }}</p>
-            <img :src="item.photo" alt="" width="100" />
+            <!-- <img :src="item.photo" alt="" width="100" /> -->
           </div>
           <div class="buttom">
             <button class="btn btn-success">
@@ -151,7 +152,7 @@ export default {
 }
 
 .wrapper {
-  margin: 50px;
+  margin-left: 50px;
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(auto-fill, 20%);
@@ -168,8 +169,7 @@ export default {
 .gridnote {
   display: flex;
   flex-wrap: wrap;
-  margin: 30px;
-
+  margin: 10px;
 
   li {
     height: 40vh;
@@ -186,10 +186,6 @@ export default {
   // grid-row-gap: 20px;
   // justify-items: stretch;
   // align-items: stretch;
- 
-
-
-
 
   .note {
     display: flex;
