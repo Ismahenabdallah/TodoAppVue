@@ -13,7 +13,7 @@ const newTodo = asynHandler(async (req, res) => {
     try {
         const { text, photo } = req.body;
 
-        if (!text || !photo)
+        if (!text)
             return res.status(400).json({ msg: "Please fill in all fields." });
         const newTodList = new Todo({
             ...req.body,

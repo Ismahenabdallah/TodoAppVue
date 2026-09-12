@@ -1,36 +1,63 @@
-
-
 import { createStore } from 'vuex'
-import jwtDecode from 'jwt-decode';
+import * as jwtDecodePkg from 'jwt-decode';
 import axios from 'axios';
-import router from '@/router';
+
+const decodeToken = (token) => {
+  const jwt = jwtDecodePkg.jwtDecode || jwtDecodePkg.default || jwtDecodePkg;
+  return jwt(token);
+};
 
 export default createStore({
-
-
   state: {
     userToken: null,
-    user: localStorage?.getItem('user'),
-    isUserLoggIn: "",
+    user: localStorage?.getItem('user') || null,
+    isUserLoggIn: !!localStorage?.getItem('user'),
     LoggedUserId: "",
     AllToDo: []
   },
   getters: {},
   mutations: {
     setUser(state, token) {
-      state.userToken = jwtDecode(token);
+      if (!token) return;
+      let cleanToken = token;
+      if (typeof cleanToken === 'string' && cleanToken.startsWith('Bearer ')) {
+        cleanToken = cleanToken.split(' ')[1];
+      }
+      try {
+        state.userToken = decodeToken(cleanToken);
+        state.user = cleanToken;
+        state.isUserLoggIn = true;
+        state.LoggedUserId = state.userToken._id;
+        localStorage.setItem('user', cleanToken);
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+      }
+    },
+    logoutUser(state) {
+      state.userToken = null;
+      state.user = null;
+      state.isUserLoggIn = false;
+      state.LoggedUserId = "";
+      localStorage.removeItem('user');
     },
     isUserLoggInFunction(state) {
-      if (state.user) {
-        state.isUserLoggIn = true
-        let user = jwtDecode(state.user);
-        state.LoggedUserId = user._id
-        console.log("LoggedUserId", state.LoggedUserId)
-        router.push({ name: "home" })
-
+      const token = localStorage.getItem('user');
+      if (token) {
+        state.isUserLoggIn = true;
+        let cleanToken = token;
+        if (typeof cleanToken === 'string' && cleanToken.startsWith('Bearer ')) {
+          cleanToken = cleanToken.split(' ')[1];
+        }
+        try {
+          let decodedUser = decodeToken(cleanToken);
+          state.userToken = decodedUser;
+          state.LoggedUserId = decodedUser._id;
+        } catch (e) {
+          state.isUserLoggIn = false;
+          localStorage.removeItem('user');
+        }
       } else {
-        state.isUserLoggIn = false
-        router.push({ name: "login" })
+        state.isUserLoggIn = false;
       }
     },
     setAllToDo(state, AllToDo) {
@@ -38,24 +65,20 @@ export default createStore({
     },
   },
   actions: {
-
-
-
     setToken({ commit }, token) {
       commit('setUser', token);
+    },
+    logout({ commit }) {
+      commit('logoutUser');
     },
     async getAllTodo({ commit }) {
       try {
         const response = await axios.get('http://localhost:5000/');
-        const todos = response.data;
-        commit('setAllToDo', todos);
+        commit('setAllToDo', response.data);
       } catch (error) {
         console.error(error);
-
       }
     },
-
   },
-  modules: {
-  }
+  modules: {}
 })
